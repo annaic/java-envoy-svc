@@ -6,7 +6,26 @@ public class ClusterVO {
     private String serviceDiscovery;
     private String lbPolicy;
     private AddressVO address;
+    private boolean iscb;
     private CircuitBreakerVO circuitBreaker;
+    private boolean clientTlsEnabled;
+    private ClientTlsVO clientTls;
+
+    public ClientTlsVO getClientTls() {
+        return clientTls;
+    }
+
+    public void setClientTls(ClientTlsVO clientTls) {
+        this.clientTls = clientTls;
+    }
+
+    public boolean isClientTlsEnabled() {
+        return clientTlsEnabled;
+    }
+
+    public void setIsClientTlsEnabled(boolean isclientTls) {
+        this.clientTlsEnabled = isclientTls;
+    }
 
     public CircuitBreakerVO getCircuitBreaker() {
         return circuitBreaker;
@@ -23,9 +42,6 @@ public class ClusterVO {
     public void setiscb(boolean iscb) {
         this.iscb = iscb;
     }
-
-    private boolean iscb;
-
 
     public String getName() {
         return name;
@@ -66,9 +82,5 @@ public class ClusterVO {
     public void setAddress(AddressVO addressVO) {
         this.address = addressVO;
     }
-
-
-
-
 
 }

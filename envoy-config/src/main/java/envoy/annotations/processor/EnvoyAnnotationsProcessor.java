@@ -2,6 +2,7 @@ package envoy.annotations.processor;
 
 import com.google.auto.service.AutoService;
 import envoy.annotations.Cluster;
+import envoy.annotations.Listener;
 import envoy.config.Connection;
 import envoy.gen.EnvoyGenerator;
 import freemarker.template.TemplateException;
@@ -24,20 +25,17 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
         Messager messager =  processingEnv.getMessager();
         if(annotations.size() == 0) return true;
         StringBuilder accumulator = new StringBuilder();
+        accumulator.append("clusters:\n");
         for(TypeElement annotation: annotations){
-            //System.err.println(annotation.getQualifiedName());
             Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(annotation);
             for(Element e : annotatedElements){
-                //System.err.println("For:" + annotation.getQualifiedName());
                 if("envoy.annotations.Cluster".equals(annotation.getQualifiedName().toString())){
                     TypeMirror typeMirror = e.asType();
-                    //System.err.println("TypeMirror:" + typeMirror.toString());
                     if(!typeMirror.toString().equals(Connection.class.getName())){
                         messager.printMessage(Diagnostic.Kind.ERROR,
                                 "The type annotated with @Cluster must be a Connection");
                     }
-                    //We have a valid Cluster annotation
-                    //Get it
+                    //We have a valid Cluster annotation, Get it
                     Cluster cluster = e.getAnnotation(Cluster.class);
                     String name = e.getSimpleName().toString();
                     try {
@@ -47,24 +45,17 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
                         messager.printMessage(Diagnostic.Kind.ERROR,
                                 ioException.getMessage());
                     }
-                    //System.err.println("cluster:" + cluster);
+                }else if("envoy.annotations.Listener".equals(annotation.getQualifiedName().toString())){
+                    Listener listener = e.getAnnotation(Listener.class);
+                    //System.err.println(listener);
 
                 }
-                //System.err.println("e:" + e.getSimpleName());
-//                Cluster cluster = e.getAnnotation(Cluster.class);
-//                System.err.println(cluster);
-//                if(e instanceof TypeElement){
-//                    TypeElement te = (TypeElement)e;
-//                    System.err.println("te:" + te.getQualifiedName());
-//                }
             }
-
-
         }
+        //Print the accumulator
+        System.err.println(accumulator.toString());
         return false;
     }
 
-    private void processCluster(Cluster cluster, StringBuilder accumulator) {
-        //Convert the Cluster to the Generator Type
-    }
+
 }

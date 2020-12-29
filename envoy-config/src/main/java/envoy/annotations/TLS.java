@@ -1,5 +1,5 @@
 package envoy.annotations;
 
 public enum TLS {
-    v12, v13
+    TLSv1_2, TLSv1_3
 }

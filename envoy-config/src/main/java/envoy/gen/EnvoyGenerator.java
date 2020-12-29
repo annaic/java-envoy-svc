@@ -9,6 +9,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -42,9 +43,14 @@ public class EnvoyGenerator {
         ClusterVO clusterVO = AnnotationToVO.mapCluster(cluster, name);
         root.put("clusterVO", clusterVO);
         /* Merge data-model with template */
-        Writer out = new OutputStreamWriter(System.out);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = new OutputStreamWriter(baos);
         template.process(root, out);
         //Convert the Cluster to the Generator Type
+        String output = baos.toString("UTF-8");
+        accumulator.append(output);
+        //System.err.println(output);
+
     }
 
 
