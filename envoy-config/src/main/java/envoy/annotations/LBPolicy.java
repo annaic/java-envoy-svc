@@ -1,5 +1,5 @@
 package envoy.annotations;
 
 public enum LBPolicy {
-    ROUND_ROBIN
+    ROUND_ROBIN, LEAST_REQUEST,RING_HASH, RANDOM, MAGLEV, CLUSTER_PROVIDED
 }

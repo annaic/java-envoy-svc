@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface HttpConnection {
+public @interface HttpManager {
     VirtualHost[] value();
 }
 

@@ -17,6 +17,11 @@
             <version>${auto-service.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.30</version>
+        </dependency>
     </dependencies>
 
     <properties>

@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface ClientTls {
+    boolean apply() default false;
     String sni() default "";
     TLS min_tls() default TLS.v12;
     boolean allow_renegotiation() default true;

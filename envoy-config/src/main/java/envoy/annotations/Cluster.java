@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Cluster {
     Address address();
-    UpstreamTLSType tls() default UpstreamTLSType.NONE;
+    ClientTls tls() default @ClientTls;
     ServiceDiscovery discovery() default ServiceDiscovery.STRICT_DNS;
-    LBPolicy value() default LBPolicy.ROUND_ROBIN;
+    LBPolicy lbtype() default LBPolicy.ROUND_ROBIN;
     double timeout_s() default 5;
     CircuitBreaker circuitbreaker() default @CircuitBreaker ;
 }
