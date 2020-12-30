@@ -1,6 +1,10 @@
 package com.svcimpl.learn;
 
 import envoy.annotations.*;
+import envoy.annotations.filter.listener.LFTypeNames;
+import envoy.annotations.filter.listener.ListenerFilter;
+import envoy.annotations.filter.network.HttpManager;
+import envoy.annotations.filter.network.NetworkFilters;
 import envoy.config.*;
 
 public class SidecarConfig {
@@ -12,7 +16,10 @@ public class SidecarConfig {
 
     @Listener(
             address = @Address(host = "0.0.0.0", port = 9211),
-            netfilter = @NetworkFilter(
+            listener_filters = {
+                    @ListenerFilter(LFTypeNames.ORIG_DST),
+                    @ListenerFilter(LFTypeNames.TLS_INSPECT)},
+            netfilter = @NetworkFilters(
                     httpmanager = @HttpManager(
                             @VirtualHost(
                                     name = "local-service",
@@ -22,13 +29,14 @@ public class SidecarConfig {
     )
     IncomingTraffic serviceEntry;
 
+
     /* The localServiceConnection that the proxy sends the message to */
     @Cluster(address = @Address(host = "127.0.0.1", port = 8080),
             discovery = ServiceDiscovery.STATIC)
     Connection localServiceConnection;
 
     @Listener( address = @Address(host = "127.0.0.1", port = 12345),
-    netfilter = @NetworkFilter(
+    netfilter = @NetworkFilters(
             httpmanager = @HttpManager(
                     @VirtualHost(
                             name = "canonical-service",

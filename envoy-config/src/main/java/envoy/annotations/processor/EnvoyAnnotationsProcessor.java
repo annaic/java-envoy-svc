@@ -4,6 +4,8 @@ import com.google.auto.service.AutoService;
 import envoy.annotations.Cluster;
 import envoy.annotations.Listener;
 import envoy.config.Connection;
+import envoy.config.IncomingTraffic;
+import envoy.config.OutgoingTraffic;
 import envoy.gen.EnvoyGenerator;
 import freemarker.template.TemplateException;
 
@@ -24,8 +26,10 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Messager messager =  processingEnv.getMessager();
         if(annotations.size() == 0) return true;
-        StringBuilder accumulator = new StringBuilder();
-        accumulator.append("clusters:\n");
+        StringBuilder listenerAccumulator = new StringBuilder();
+        listenerAccumulator.append("  listeners:\n");
+        StringBuilder clusterAccumulator = new StringBuilder();
+        clusterAccumulator.append("  clusters:\n");
         for(TypeElement annotation: annotations){
             Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(annotation);
             for(Element e : annotatedElements){
@@ -39,21 +43,35 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
                     Cluster cluster = e.getAnnotation(Cluster.class);
                     String name = e.getSimpleName().toString();
                     try {
-                        EnvoyGenerator.Instance.processCluster(cluster, name, accumulator);
-                    } catch (IOException | TemplateException ioException) {
-                        ioException.printStackTrace();
+                        EnvoyGenerator.Instance.processCluster(cluster, name, clusterAccumulator);
+                    } catch (IOException | TemplateException exception) {
+                        exception.printStackTrace();
                         messager.printMessage(Diagnostic.Kind.ERROR,
-                                ioException.getMessage());
+                                exception.getMessage());
                     }
                 }else if("envoy.annotations.Listener".equals(annotation.getQualifiedName().toString())){
+                    TypeMirror typeMirror = e.asType();
+                    if(!typeMirror.toString().equals(OutgoingTraffic.class.getName())
+                            && !typeMirror.toString().equals(IncomingTraffic.class.getName())){
+                        messager.printMessage(Diagnostic.Kind.ERROR,
+                                "The type annotated with @Listener must be a IncomingTraffic or OutgoingTraffic");
+                    }
                     Listener listener = e.getAnnotation(Listener.class);
-                    //System.err.println(listener);
+                    String name = e.getSimpleName().toString();
+                    try {
+                        EnvoyGenerator.Instance.processListener(listener, name,typeMirror.toString(), listenerAccumulator);
+                    } catch (IOException | TemplateException exception) {
+                        exception.printStackTrace();
+                        messager.printMessage(Diagnostic.Kind.ERROR,
+                                exception.getMessage());
+                    }
 
                 }
             }
         }
-        //Print the accumulator
-        System.err.println(accumulator.toString());
+        //Print the accumulators
+        //System.err.println(listenerAccumulator.toString());
+        //System.err.println(clusterAccumulator.toString());
         return false;
     }
 

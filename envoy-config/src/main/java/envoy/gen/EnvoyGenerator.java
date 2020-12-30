@@ -1,8 +1,10 @@
 package envoy.gen;
 
 import envoy.annotations.Cluster;
+import envoy.annotations.Listener;
 import envoy.gen.freemarker.AddressVO;
 import envoy.gen.freemarker.ClusterVO;
+import envoy.gen.freemarker.ListenerVO;
 import envoy.gen.freemarker.mapper.AnnotationToVO;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -54,4 +56,18 @@ public class EnvoyGenerator {
     }
 
 
+    public void processListener(Listener listener, String name, String trafficDirection, StringBuilder accumulator)
+            throws IOException, TemplateException {
+        Template template = cfg.getTemplate("listener.yaml.ftl");
+
+        Map root = new HashMap();
+        ListenerVO listenerVO = AnnotationToVO.mapListener(listener,name,trafficDirection);
+        root.put("listener", listenerVO);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = new OutputStreamWriter(baos);
+        template.process(root, out);
+        String output = baos.toString("UTF-8");
+        accumulator.append(output);
+        System.err.println(output);
+    }
 }
