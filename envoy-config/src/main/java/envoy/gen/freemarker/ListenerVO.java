@@ -1,10 +1,21 @@
 package envoy.gen.freemarker;
 
+import envoy.gen.TCPProxyVO;
+
 public class ListenerVO {
     private String name;
     String typeName;
     private AddressVO address;
     private ListenerFilterVO [] listenerFilters = {};
+    private TCPProxyVO [] tcpProxyFilters = {};
+
+    public TCPProxyVO[] getTcpProxyFilters() {
+        return tcpProxyFilters;
+    }
+
+    public void setTcpProxyFilters(TCPProxyVO[] tcpProxyFilters) {
+        this.tcpProxyFilters = tcpProxyFilters;
+    }
 
     public ListenerFilterVO [] getListenerFilters() {
         return listenerFilters;

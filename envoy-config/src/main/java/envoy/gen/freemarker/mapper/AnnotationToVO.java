@@ -5,6 +5,8 @@ import envoy.annotations.ClientTls;
 import envoy.annotations.Cluster;
 import envoy.annotations.Listener;
 import envoy.annotations.filter.listener.ListenerFilter;
+import envoy.annotations.filter.network.TCPProxy;
+import envoy.gen.TCPProxyVO;
 import envoy.gen.freemarker.*;
 import org.checkerframework.checker.units.qual.C;
 
@@ -73,6 +75,20 @@ public class AnnotationToVO {
             listenerVO.setListenerFilters(listenerFilterVOS);
         }
 
+        TCPProxy[] tcpProxies = listener.netfilter().tcp_filters();
+        if(tcpProxies.length > 0){
+            TCPProxyVO [] tcpProxyVOS = new TCPProxyVO[tcpProxies.length];
+            for(int i =0; i < tcpProxyVOS.length; i++){
+                TCPProxyVO proxyVO = new TCPProxyVO();
+                proxyVO.setName(tcpProxies[i].name());
+                proxyVO.setCluster_name(tcpProxies[i].cluster_name());
+                proxyVO.setTyped_config(tcpProxies[i].typed_config());
+                proxyVO.setStat_prefix(tcpProxies[i].stat_prefix());
+                proxyVO.setDestination_port(tcpProxies[i].destination_port());
+                tcpProxyVOS[i] = proxyVO;
+            }
+            listenerVO.setTcpProxyFilters(tcpProxyVOS);
+        }
         return listenerVO;
     }
 }

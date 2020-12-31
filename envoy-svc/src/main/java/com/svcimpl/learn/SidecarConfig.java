@@ -5,6 +5,7 @@ import envoy.annotations.filter.listener.LFTypeNames;
 import envoy.annotations.filter.listener.ListenerFilter;
 import envoy.annotations.filter.network.HttpManager;
 import envoy.annotations.filter.network.NetworkFilters;
+import envoy.annotations.filter.network.TCPProxy;
 import envoy.config.*;
 
 public class SidecarConfig {
@@ -25,6 +26,7 @@ public class SidecarConfig {
                                     name = "local-service",
                                     domains = {"*"},
                                     routes = @Route(cluster_name = "localServiceConnection"))),
+                    tcp_filters = @TCPProxy(destination_port = 9901, cluster_name = "admin_service", stat_prefix = "inbound|tcp|admin"),
                     tls = @ServerTls(apply = true))
     )
     IncomingTraffic serviceEntry;
@@ -36,12 +38,15 @@ public class SidecarConfig {
     Connection localServiceConnection;
 
     @Listener( address = @Address(host = "127.0.0.1", port = 12345),
-    netfilter = @NetworkFilters(
-            httpmanager = @HttpManager(
-                    @VirtualHost(
+            listener_filters = {@ListenerFilter(LFTypeNames.ORIG_DST)},
+            netfilter = @NetworkFilters(
+                    httpmanager = @HttpManager(@VirtualHost(
                             name = "canonical-service",
                             domains = {"canonical-service", "canonical-service.k8s.cnqr.tech"},
-                            routes = @Route(cluster_name = "canonicalServiceConnection")))))
+                            routes = @Route(cluster_name = "canonicalServiceConnection"))),
+                    tcp_filters = {
+                            @TCPProxy(destination_port = 3128, cluster_name = "proxy", stat_prefix = "outbound|tcp|proxy"),
+                            @TCPProxy(destination_port = 53, cluster_name = "outbound_dns", stat_prefix = "outbound|tcp|dns")}))
     OutgoingTraffic canonicalServiceTraffic;
 
     @Cluster(
