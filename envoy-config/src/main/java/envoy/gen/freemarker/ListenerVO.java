@@ -1,13 +1,21 @@
 package envoy.gen.freemarker;
 
-import envoy.gen.TCPProxyVO;
-
 public class ListenerVO {
     private String name;
     String typeName;
     private AddressVO address;
+    private HttpManagerVO httpManager;
     private ListenerFilterVO [] listenerFilters = {};
     private TCPProxyVO [] tcpProxyFilters = {};
+
+
+    public HttpManagerVO getHttpManager() {
+        return httpManager;
+    }
+
+    public void setHttpManager(HttpManagerVO httpManager) {
+        this.httpManager = httpManager;
+    }
 
     public TCPProxyVO[] getTcpProxyFilters() {
         return tcpProxyFilters;

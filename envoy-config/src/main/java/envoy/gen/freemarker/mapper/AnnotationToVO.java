@@ -1,14 +1,11 @@
 package envoy.gen.freemarker.mapper;
 
-import envoy.annotations.CircuitBreaker;
-import envoy.annotations.ClientTls;
-import envoy.annotations.Cluster;
-import envoy.annotations.Listener;
+import envoy.annotations.*;
 import envoy.annotations.filter.listener.ListenerFilter;
+import envoy.annotations.filter.network.HttpManager;
 import envoy.annotations.filter.network.TCPProxy;
-import envoy.gen.TCPProxyVO;
+import envoy.gen.freemarker.TCPProxyVO;
 import envoy.gen.freemarker.*;
-import org.checkerframework.checker.units.qual.C;
 
 public class AnnotationToVO {
 
@@ -58,6 +55,42 @@ public class AnnotationToVO {
         addressVO.setHost(listener.address().host());
         addressVO.setPort(listener.address().port());
         listenerVO.setAddress(addressVO);
+        HttpManager httpmanager = listener.netfilter().httpmanager();
+        HttpManagerVO httpManagerVO = new HttpManagerVO();
+        if(httpmanager.apply()){
+            httpManagerVO.setActive(true);
+            httpManagerVO.setName(httpmanager.name());
+            httpManagerVO.setTyped_config(httpmanager.typed_config());
+            httpManagerVO.setStat_prefix(httpmanager.stat_prefix());
+            VirtualHost[] virtualHosts = httpmanager.value();
+            if(virtualHosts.length > 0){
+                VHostVO [] vHostVOS = new VHostVO[virtualHosts.length];
+                for(int i = 0; i < vHostVOS.length; i++){
+                    VHostVO vHostVO = new VHostVO();
+                    vHostVO.setName(virtualHosts[i].name());
+                    vHostVO.setDomains(virtualHosts[i].domains());
+                    Route [] routes = virtualHosts[i].routes();
+                    if(routes.length > 0){
+                        RouteVO [] routeVOS = new RouteVO[routes.length];
+                        for(int j = 0; j < routeVOS.length; j++){
+                            RouteVO routeVO = new RouteVO();
+                            routeVO.setPrefixMatch(routes[j].prefix_match());
+                            routeVO.setPrefixRewrite(routes[j].prefix_rewrite());
+                            routeVO.setHeaderNameToMatch(routes[j].header_match_name());
+                            routeVO.setHeaderValueToMatch(routes[j].header_match_value());
+                            routeVO.setClusterName(routes[j].cluster_name());
+                            routeVOS[j] = routeVO;
+                        }
+                        vHostVO.setRoutes(routeVOS);
+                    }
+                    vHostVOS[i] = vHostVO;
+                }
+                httpManagerVO.setvHosts(vHostVOS);
+            }
+        }else{
+            httpManagerVO.setActive(false);
+        }
+        listenerVO.setHttpManager(httpManagerVO);
         ListenerFilter[] listenerFilters = listener.listener_filters();
         if(listenerFilters.length > 0){
             ListenerFilterVO[] listenerFilterVOS = new ListenerFilterVO[listenerFilters.length];

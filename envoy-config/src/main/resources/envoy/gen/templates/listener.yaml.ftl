@@ -29,21 +29,32 @@
           stat_prefix: ${tpf.stat_prefix}
     </#list>
   </#if>
+  <#assign http_active = listener.httpManager.active>
+  <#if http_active>
     - filters:
-      - name: envoy.filters.network.http_connection_manager
+      - name: ${listener.httpManager.name}
         typed_config:
-          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
-          stat_prefix: ingress_http
+          "@type": ${listener.httpManager.typed_config}
+          stat_prefix: ${listener.httpManager.stat_prefix}
           route_config:
             name: ${listener.name}Route
             virtual_hosts:
-              - name: ${listener.name}VHost
-                domains: ["*"]
+    <#list listener.httpManager.vHosts as vHost>
+              - name: ${vHost.name}
+                domains:
+      <#list vHost.domains as domain>
+                - "${domain}"
+      </#list>
                 routes:
-                  - match: {prefix: "/"}
+      <#list vHost.routes as route>
+                  - match:
+                      prefix: ${route.prefixMatch}
                     route:
                       auto_host_rewrite: true
-                      cluster: canonical_client
+                      cluster: ${route.clusterName}
+      </#list>
+    </#list>
           http_filters:
             - name: envoy.filters.http.router
               typed_config: {}
+  </#if>

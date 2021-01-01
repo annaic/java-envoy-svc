@@ -18,6 +18,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class EnvoyGenerator {
     public static final EnvoyGenerator Instance = new EnvoyGenerator();
     private Configuration cfg;
@@ -37,6 +38,8 @@ public class EnvoyGenerator {
         cfg.setWrapUncheckedExceptions(true);
         cfg.setFallbackOnNullLoopVariable(false);
     }
+
+
 
     public void processCluster(Cluster cluster, String name, StringBuilder accumulator) throws IOException, TemplateException {
         Template template = cfg.getTemplate("cluster.yaml.ftl");
@@ -68,6 +71,6 @@ public class EnvoyGenerator {
         template.process(root, out);
         String output = baos.toString("UTF-8");
         accumulator.append(output);
-        System.err.println(output);
+        //System.err.println(output);
     }
 }

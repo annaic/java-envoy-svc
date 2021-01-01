@@ -27,6 +27,7 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
         Messager messager =  processingEnv.getMessager();
         if(annotations.size() == 0) return true;
         StringBuilder listenerAccumulator = new StringBuilder();
+        listenerAccumulator.append("static_resources:\n");
         listenerAccumulator.append("  listeners:\n");
         StringBuilder clusterAccumulator = new StringBuilder();
         clusterAccumulator.append("  clusters:\n");
@@ -70,8 +71,8 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
             }
         }
         //Print the accumulators
-        //System.err.println(listenerAccumulator.toString());
-        //System.err.println(clusterAccumulator.toString());
+        System.err.println(listenerAccumulator.toString());
+        System.err.println(clusterAccumulator.toString());
         return false;
     }
 

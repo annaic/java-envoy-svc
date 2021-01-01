@@ -21,13 +21,12 @@ public class SidecarConfig {
                     @ListenerFilter(LFTypeNames.ORIG_DST),
                     @ListenerFilter(LFTypeNames.TLS_INSPECT)},
             netfilter = @NetworkFilters(
-                    httpmanager = @HttpManager(
-                            @VirtualHost(
+                    httpmanager = @HttpManager(apply = true,
+                            value = @VirtualHost(
                                     name = "local-service",
                                     domains = {"*"},
-                                    routes = @Route(cluster_name = "localServiceConnection"))),
-                    tcp_filters = @TCPProxy(destination_port = 9901, cluster_name = "admin_service", stat_prefix = "inbound|tcp|admin"),
-                    tls = @ServerTls(apply = true))
+                                    routes = @Route(cluster_name = "localServiceConnection")), tls = @ServerTls(apply = true)),
+                    tcp_filters = @TCPProxy(destination_port = 9901, cluster_name = "admin_service", stat_prefix = "inbound|tcp|admin"))
     )
     IncomingTraffic serviceEntry;
 
@@ -40,10 +39,11 @@ public class SidecarConfig {
     @Listener( address = @Address(host = "127.0.0.1", port = 12345),
             listener_filters = {@ListenerFilter(LFTypeNames.ORIG_DST)},
             netfilter = @NetworkFilters(
-                    httpmanager = @HttpManager(@VirtualHost(
+                    httpmanager = @HttpManager(
+                            value = @VirtualHost(
                             name = "canonical-service",
                             domains = {"canonical-service", "canonical-service.k8s.cnqr.tech"},
-                            routes = @Route(cluster_name = "canonicalServiceConnection"))),
+                            routes = @Route(cluster_name = "canonicalServiceConnection")), apply = true),
                     tcp_filters = {
                             @TCPProxy(destination_port = 3128, cluster_name = "proxy", stat_prefix = "outbound|tcp|proxy"),
                             @TCPProxy(destination_port = 53, cluster_name = "outbound_dns", stat_prefix = "outbound|tcp|dns")}))

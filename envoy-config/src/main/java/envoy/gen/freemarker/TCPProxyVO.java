@@ -1,4 +1,4 @@
-package envoy.gen;
+package envoy.gen.freemarker;
 
 public class TCPProxyVO {
     private String name;
