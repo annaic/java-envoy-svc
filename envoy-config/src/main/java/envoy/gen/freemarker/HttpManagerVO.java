@@ -6,6 +6,15 @@ public class HttpManagerVO {
     private String stat_prefix;
     private boolean active;
     private VHostVO[] vHosts = {};
+    private ServerTlsVO serverTls;
+
+    public ServerTlsVO getServerTls() {
+        return serverTls;
+    }
+
+    public void setServerTls(ServerTlsVO serverTls) {
+        this.serverTls = serverTls;
+    }
 
     public String getStat_prefix() {
         return stat_prefix;

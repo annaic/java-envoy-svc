@@ -57,4 +57,22 @@
           http_filters:
             - name: envoy.filters.http.router
               typed_config: {}
+    <#assign server_tls_active = listener.httpManager.serverTls.active>
+    <#if server_tls_active>
+    transport_socket:
+      name: ${listener.httpManager.serverTls.name}
+      typed_config:
+        "@type": ${listener.httpManager.serverTls.typed_config}
+        common_tls_context:
+          tls_certificate_sds_secret_configs:
+            name: server-certificate
+            sds_config:
+              path: ${listener.httpManager.serverTls.cert_path}
+            tls_params:
+              tls_minimum_protocol_version: ${listener.httpManager.serverTls.min_tls}
+            validation_context_sds_secret_config:
+              name: server-validation
+              sds_config:
+                path: ${listener.httpManager.serverTls.server_validation_path}
+    </#if>
   </#if>

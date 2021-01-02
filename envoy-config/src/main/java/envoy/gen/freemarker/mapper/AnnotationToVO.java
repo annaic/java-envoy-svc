@@ -62,6 +62,14 @@ public class AnnotationToVO {
             httpManagerVO.setName(httpmanager.name());
             httpManagerVO.setTyped_config(httpmanager.typed_config());
             httpManagerVO.setStat_prefix(httpmanager.stat_prefix());
+            ServerTlsVO serverTlsVO = new ServerTlsVO();
+            serverTlsVO.setActive(httpmanager.tls().apply());
+            serverTlsVO.setCert_path(httpmanager.tls().cert_path());
+            serverTlsVO.setMin_tls(httpmanager.tls().min_tls().name());
+            serverTlsVO.setServer_validation_path(httpmanager.tls().server_validation_path());
+            serverTlsVO.setName(httpmanager.tls().name());
+            serverTlsVO.setTyped_config(httpmanager.tls().typed_config());
+            httpManagerVO.setServerTls(serverTlsVO);
             VirtualHost[] virtualHosts = httpmanager.value();
             if(virtualHosts.length > 0){
                 VHostVO [] vHostVOS = new VHostVO[virtualHosts.length];
@@ -123,5 +131,16 @@ public class AnnotationToVO {
             listenerVO.setTcpProxyFilters(tcpProxyVOS);
         }
         return listenerVO;
+    }
+
+    public static AdminVO mapAdmin(Admin admin, String name) {
+        AdminVO adminVO = new AdminVO();
+        adminVO.setService(admin.service());
+        adminVO.setAccess_log_path(admin.access_log_path());
+        AddressVO addressVO = new AddressVO();
+        addressVO.setHost(admin.address().host());
+        addressVO.setPort(admin.address().port());
+        adminVO.setAddress(addressVO);
+        return adminVO;
     }
 }

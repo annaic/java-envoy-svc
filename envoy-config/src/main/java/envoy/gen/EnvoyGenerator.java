@@ -1,8 +1,10 @@
 package envoy.gen;
 
+import envoy.annotations.Admin;
 import envoy.annotations.Cluster;
 import envoy.annotations.Listener;
 import envoy.gen.freemarker.AddressVO;
+import envoy.gen.freemarker.AdminVO;
 import envoy.gen.freemarker.ClusterVO;
 import envoy.gen.freemarker.ListenerVO;
 import envoy.gen.freemarker.mapper.AnnotationToVO;
@@ -39,14 +41,12 @@ public class EnvoyGenerator {
         cfg.setFallbackOnNullLoopVariable(false);
     }
 
-
-
-    public void processCluster(Cluster cluster, String name, StringBuilder accumulator) throws IOException, TemplateException {
-        Template template = cfg.getTemplate("cluster.yaml.ftl");
+    public void processAdmin(Admin admin, String name, StringBuilder accumulator) throws IOException, TemplateException {
+        Template template = cfg.getTemplate("admin.yaml.ftl");
 
         Map root = new HashMap();
-        ClusterVO clusterVO = AnnotationToVO.mapCluster(cluster, name);
-        root.put("clusterVO", clusterVO);
+        AdminVO adminVO = AnnotationToVO.mapAdmin(admin, name);
+        root.put("admin", adminVO);
         /* Merge data-model with template */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer out = new OutputStreamWriter(baos);
@@ -54,15 +54,26 @@ public class EnvoyGenerator {
         //Convert the Cluster to the Generator Type
         String output = baos.toString("UTF-8");
         accumulator.append(output);
-        //System.err.println(output);
+    }
 
+    public void processCluster(Cluster cluster, String name, StringBuilder accumulator) throws IOException, TemplateException {
+        Template template = cfg.getTemplate("cluster.yaml.ftl");
+        Map root = new HashMap();
+        ClusterVO clusterVO = AnnotationToVO.mapCluster(cluster, name);
+        root.put("cluster", clusterVO);
+        /* Merge data-model with template */
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = new OutputStreamWriter(baos);
+        template.process(root, out);
+        //Convert the Cluster to the Generator Type
+        String output = baos.toString("UTF-8");
+        accumulator.append(output);
     }
 
 
     public void processListener(Listener listener, String name, String trafficDirection, StringBuilder accumulator)
             throws IOException, TemplateException {
         Template template = cfg.getTemplate("listener.yaml.ftl");
-
         Map root = new HashMap();
         ListenerVO listenerVO = AnnotationToVO.mapListener(listener,name,trafficDirection);
         root.put("listener", listenerVO);
@@ -71,6 +82,5 @@ public class EnvoyGenerator {
         template.process(root, out);
         String output = baos.toString("UTF-8");
         accumulator.append(output);
-        //System.err.println(output);
     }
 }

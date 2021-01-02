@@ -2,7 +2,7 @@ package envoy.annotations;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
 @Repeatable(Routes.class)
 public @interface Route {
@@ -13,7 +13,7 @@ public @interface Route {
     String cluster_name();
 }
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @interface Routes{
     Route[] value();
 }

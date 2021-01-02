@@ -2,7 +2,7 @@ package envoy.annotations;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
 @Repeatable(VirtualHosts.class)
 public @interface VirtualHost {
@@ -11,7 +11,7 @@ public @interface VirtualHost {
     Route [] routes() default {};
 }
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @interface VirtualHosts{
     VirtualHost[] value();
 }

@@ -1,6 +1,5 @@
 package envoy.gen.freemarker;
 
-import envoy.annotations.TLS;
 
 public class ClientTlsVO {
 

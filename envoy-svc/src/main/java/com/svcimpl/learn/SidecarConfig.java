@@ -10,7 +10,7 @@ import envoy.config.*;
 
 public class SidecarConfig {
 
-    @AdminListener(
+    @Admin(service = "canonical-client",
             address = @Address(host = "0.0.0.0", port = 9901))
     IncomingAdminTraffic admin;
 
@@ -61,6 +61,4 @@ public class SidecarConfig {
             circuitbreaker = @CircuitBreaker(active = true, maxconnections = 5, queuedepth = 4))
     Connection mysql;
 
-//    @Cluster(address = @Address(host = "127.0.0.1", port = 8080))
-//    IncomingTraffic test;
 }

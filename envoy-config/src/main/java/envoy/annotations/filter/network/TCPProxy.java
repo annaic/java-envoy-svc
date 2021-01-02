@@ -3,7 +3,7 @@ package envoy.annotations.filter.network;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
 @Repeatable(TCPProxys.class)
 public @interface TCPProxy {
@@ -15,7 +15,7 @@ public @interface TCPProxy {
     int destination_port();
 }
 
-@Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
+@Target({ElementType.FIELD})
 @interface TCPProxys{
     TCPProxy[] value();
 }

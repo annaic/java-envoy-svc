@@ -1,9 +1,11 @@
 package envoy.annotations.processor;
 
 import com.google.auto.service.AutoService;
+import envoy.annotations.Admin;
 import envoy.annotations.Cluster;
 import envoy.annotations.Listener;
 import envoy.config.Connection;
+import envoy.config.IncomingAdminTraffic;
 import envoy.config.IncomingTraffic;
 import envoy.config.OutgoingTraffic;
 import envoy.gen.EnvoyGenerator;
@@ -26,8 +28,8 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         Messager messager =  processingEnv.getMessager();
         if(annotations.size() == 0) return true;
+        StringBuilder adminAccumulator = new StringBuilder();
         StringBuilder listenerAccumulator = new StringBuilder();
-        listenerAccumulator.append("static_resources:\n");
         listenerAccumulator.append("  listeners:\n");
         StringBuilder clusterAccumulator = new StringBuilder();
         clusterAccumulator.append("  clusters:\n");
@@ -67,10 +69,27 @@ public class EnvoyAnnotationsProcessor extends AbstractProcessor {
                                 exception.getMessage());
                     }
 
+                } else if("envoy.annotations.Admin".equals(annotation.getQualifiedName().toString())){
+                    TypeMirror typeMirror = e.asType();
+                    if(!typeMirror.toString().equals(IncomingAdminTraffic.class.getName())){
+                        messager.printMessage(Diagnostic.Kind.ERROR,
+                                "The type annotated with @Admin must be a IncomingAdminTraffic");
+                    }
+                    //We have a valid AdminListener annotation, Get it
+                    Admin admin = e.getAnnotation(Admin.class);
+                    String name = e.getSimpleName().toString();
+                    try {
+                        EnvoyGenerator.Instance.processAdmin(admin, name, adminAccumulator);
+                    } catch (IOException | TemplateException exception) {
+                        exception.printStackTrace();
+                        messager.printMessage(Diagnostic.Kind.ERROR,
+                                exception.getMessage());
+                    }
                 }
             }
         }
         //Print the accumulators
+        System.err.println(adminAccumulator.toString());
         System.err.println(listenerAccumulator.toString());
         System.err.println(clusterAccumulator.toString());
         return false;

@@ -1,4 +1,4 @@
-package envoy.annotations.filter.network;
+package envoy.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,7 +7,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface NetworkFilters {
-    HttpManager httpmanager() default @HttpManager();
-    TCPProxy[] tcp_filters() default {};
+public @interface Admin {
+    String service();
+    Address address();
+    String access_log_path() default "/tmp/admin_access.log";
+
 }
